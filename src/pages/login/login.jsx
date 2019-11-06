@@ -1,5 +1,6 @@
 import React, {Component} from 'react'
 import {Form, Icon, Input, Button} from 'antd'
+import {reqLogin} from '../../api'
 import './login.less'
 import logo from './images/logo.png'
 /*
@@ -15,7 +16,13 @@ class Login extends Component {
         //对所有表单进行字段校验
         form.validateFields((err, values) => {
             if(!err){
-                console.log("提交登录的ajax请求", values)
+                //console.log("提交登录的ajax请求", values)
+                const {username, password} = values
+                reqLogin(username, password).then(response =>{
+                    console.log("成功了", response.data)
+                }).catch(error => {
+                    console.log("失败了", error)
+                })
             }else{
                 console.log("校验失败")
             }
@@ -119,3 +126,14 @@ class Login extends Component {
 */
 const WrapLogin = Form.create()(Login)
 export default WrapLogin
+
+/*
+async和await
+1、作用
+    简化promise对象的使用：不用再使用then()来指定成功、失败的回调函数
+    以同步编码（没有回调函数了）方式实现异步流程
+2、哪里写async
+    await所在函数（最近的）定义的左侧写async
+3、哪里写await
+    在返回promise的表达式左侧写await：不想要promise,想要promise异步执行的成功的value数据
+*/
