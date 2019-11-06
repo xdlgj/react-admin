@@ -14,15 +14,16 @@ class Login extends Component {
         //得到form对象
         const {form} = this.props
         //对所有表单进行字段校验
-        form.validateFields((err, values) => {
+        form.validateFields( async (err, values) => {
             if(!err){
                 //console.log("提交登录的ajax请求", values)
                 const {username, password} = values
-                reqLogin(username, password).then(response =>{
-                    console.log("成功了", response.data)
-                }).catch(error => {
-                    console.log("失败了", error)
-                })
+                try{
+                    const response = await reqLogin(username, password)
+                    console.log("请求成功", response.data)
+                }catch(error){
+                    console.log("请求失败", error)
+                }     
             }else{
                 console.log("校验失败")
             }
