@@ -1,5 +1,5 @@
 import React, {Component} from 'react'
-import {Form, Icon, Input, Button} from 'antd'
+import {Form, Icon, Input, Button, message} from 'antd'
 import {reqLogin} from '../../api'
 import './login.less'
 import logo from './images/logo.png'
@@ -18,12 +18,14 @@ class Login extends Component {
             if(!err){
                 //console.log("提交登录的ajax请求", values)
                 const {username, password} = values
-                try{
-                    const response = await reqLogin(username, password)
-                    console.log("请求成功", response.data)
-                }catch(error){
-                    console.log("请求失败", error)
-                }     
+                const result = await reqLogin(username, password)
+                if (result.status === 200){
+                    message.success('登录成功')
+                    //跳转到管理界面(不需要再回退到登录界面所以用replace方法)
+                    this.props.history.replace('/')
+                }else{
+                    message.error(result.message)
+                }   
             }else{
                 console.log("校验失败")
             }
