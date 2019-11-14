@@ -39,7 +39,7 @@ export default class Admin extends Component {
                             <Route path='/charts/bar' component={Bar} />
                             <Route path='/charts/line' component={Line} />
                             <Route path='/charts/pie' component={Pie} />
-                            <Redirect to='/Home'/>
+                            <Redirect to='/home'/>
                         </Switch>
                     </Content>
                     <Footer style={{textAlign:'center',color:'cccccc'}}>推荐使用谷歌浏览器</Footer>
