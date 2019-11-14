@@ -1,6 +1,6 @@
 import React, {Component} from 'react'
 import {Link} from 'react-router-dom'
-import { Menu, Icon, Button } from 'antd';
+import { Menu, Icon} from 'antd';
 
 import './index.less'
 import logo from '../../assets/images/logo.png'
@@ -12,7 +12,7 @@ export default class LeftNav extends Component {
     render() {
         return (
             <div className='left-nav'>
-                <Link className='left-nav-header'>
+                <Link to='/home' className='left-nav-header'>
                    <img src={logo} alt='' />
                     <h1>硅谷后台</h1> 
                 </Link>
@@ -20,9 +20,11 @@ export default class LeftNav extends Component {
                     mode="inline"
                     theme="dark"
                 >
-                    <Menu.Item key="1">
-                        <Icon type="pie-chart" />
-                        <span>首页</span>
+                    <Menu.Item key="home">
+                        <Link to='/home'>
+                            <Icon type="home" />
+                            <span>首页</span>
+                        </Link> 
                     </Menu.Item>
 
                     <SubMenu
@@ -34,15 +36,31 @@ export default class LeftNav extends Component {
                         </span>
                         }
                     >
-                        <Menu.Item key="5">
-                            <Icon type='mail' />
-                            <span>品类管理</span>
+                        <Menu.Item key="category">
+                            <Link to='/category'>
+                                <Icon type='mail' />
+                                <span>品类管理</span>
+                            </Link>
                         </Menu.Item>
-                        <Menu.Item key="6">
-                            <Icon type='mail' />
-                            <span>商品管理</span>
+                        <Menu.Item key="product">
+                            <Link to='/product'>
+                                <Icon type='mail' />
+                                <span>商品管理</span>
+                            </Link>
                         </Menu.Item>
                     </SubMenu>
+                    <Menu.Item key="user">
+                        <Link to='/user'>
+                            <Icon type="user" />
+                            <span>用户管理</span>
+                        </Link>
+                    </Menu.Item>
+                    <Menu.Item key="role">
+                        <Link to='/role'>
+                            <Icon type="home" />
+                            <span>角色管理</span>
+                        </Link>   
+                    </Menu.Item>
                 </Menu>
           </div>
             
