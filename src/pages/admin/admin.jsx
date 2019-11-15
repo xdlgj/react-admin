@@ -31,14 +31,14 @@ export default class Admin extends Component {
                     <Header />
                     <Content style={{backgroundColor:'red'}}>
                         <Switch>
-                            <Route path='/home' component={Home} />
-                            <Route path='/category' component={Category} />
-                            <Route path='/product' component={Product} />
-                            <Route path='/role' component={Role} />
-                            <Route path='/user' component={User} />
-                            <Route path='/charts/bar' component={Bar} />
-                            <Route path='/charts/line' component={Line} />
-                            <Route path='/charts/pie' component={Pie} />
+                            <Route path='/home?' component={Home} />
+                            <Route path='/category?' component={Category} />
+                            <Route path='/product?' component={Product} />
+                            <Route path='/role?' component={Role} />
+                            <Route path='/user?' component={User} />
+                            <Route path='/charts/bar?' component={Bar} />
+                            <Route path='/charts/line?' component={Line} />
+                            <Route path='/charts/pie?' component={Pie} />
                             <Redirect to='/home'/>
                         </Switch>
                     </Content>
