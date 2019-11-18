@@ -16,6 +16,12 @@ export const reqLogin = (username, password) => ajax('/login', {username, passwo
 //添加用户
 export const reqAddUser = (user) => ajax('/manage/user/add', user, 'POST')
 
+//获取一级或二级分类的列表
+export const reqCategorys = (parentId) => ajax('/manage/category/list', {parentId})
+//添加分类
+export const reqAddCategory = (categoryName, parentId) => ajax('/manage/category/add', {categoryName, parentId}, 'POST')
+//修改分类
+export const reqUpdateCategory = ({categoryId, categoryName}) => ajax('/manage/category/update', {categoryId, categoryName}, 'POST')
 /*
 jsonp请求的接口请求函数
 */
