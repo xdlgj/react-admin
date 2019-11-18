@@ -22,7 +22,7 @@ class Login extends Component {
                 //console.log("提交登录的ajax请求", values)
                 const {username, password} = values
                 const result = await reqLogin(username, password)
-                if (result.status === 200){
+                if (result.status === 0){
                     message.success('登录成功')
                     //将username保存到内存中
                     memoryUtils.userName = username
@@ -31,7 +31,7 @@ class Login extends Component {
                     //跳转到管理界面(不需要再回退到登录界面所以用replace方法)
                     this.props.history.replace('/')
                 }else{
-                    message.error(result.message)
+                    message.error(result.msg)
                 }   
             }else{
                 console.log("校验失败")
