@@ -2,6 +2,8 @@ import React, { Component} from 'react'
 import {Button, Icon, Table, Card, message, Modal} from 'antd'
 import LinkButton from '../../components/link-button'
 import {reqCategorys} from '../../api'
+import AddForm from './add-form'
+import UpdateForm from './update-form'
 /*
 商品分类路由
  */
@@ -155,6 +157,7 @@ export default class Category extends Component {
 						}	
 					}
 				>
+					<AddForm />
 				</Modal>
 				
 				<Modal
@@ -166,7 +169,7 @@ export default class Category extends Component {
 						}
 					}
 				>
-
+					<UpdateForm />
 				</Modal>
     		</Card>
         )
