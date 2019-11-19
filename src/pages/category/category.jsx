@@ -12,6 +12,7 @@ export default class Category extends Component {
 		subCategorys: [], //二级分类列表
 		parentId: '0', //当前需要显示的分类列表的父分类Id
 		parentName: '', //当前需要显示的分类列表的父分类Name
+		showStatus: 0, //是否显示对话框，0：都不显示， 1：显示添加， 2：显示更新
 	}
 	/*
 	初始化Table所有列的数据
@@ -30,7 +31,7 @@ export default class Category extends Component {
 		    width: '300px',
 		    render: (category) => (//返回需要显示的界面标签
 		    	<span>
-		    		<LinkButton>修改分类</LinkButton>
+		    		<LinkButton onClick={this.updateCategory}>修改分类</LinkButton>
 		    		{/*如何向事件回调函数传递参数：先定义一个箭头函数，在函数中调用处理的函数并传入参数*/}
 		    		{this.state.partenId==='0' ? <LinkButton onClick={() => this.showSubCategorys(category)}>查看子分类</LinkButton> : null}
 		    	</span>
@@ -94,6 +95,18 @@ export default class Category extends Component {
 		})
 	}
 	/*
+	显示添加对话框
+	*/
+	showAdd = () => {
+		this.setState({showStatus: 1})
+	}
+	/*
+	显示修改分类对话框
+	*/
+	updateCategory = () => {
+		this.setState({showStatus: 2})
+	}
+	/*
 	为第一次render（）准备数据
 	*/
 	componentWillMount() {
@@ -106,7 +119,7 @@ export default class Category extends Component {
 	}
     render() {
     	//读取状态数据
-    	const {categorys, loading, subCategorys, parentId, parentName} = this.state
+		const {categorys, loading, subCategorys, parentId, parentName, showStatus} = this.state
     	//card的左侧
     	const title = parentId==='0' ? '一级分类' : (
     		<span>
@@ -117,7 +130,7 @@ export default class Category extends Component {
     	)
     	//card的右侧
     	const extra = (
-    		<Button type='primary'>
+    		<Button type='primary' onClick={this.showAdd}>
     			<Icon type='plus' />
     			添加
     		</Button>
@@ -133,6 +146,28 @@ export default class Category extends Component {
       			columns={this.columns} 
       			pagination={{defaultPageSize: 5, showQuickJumper: true}}
       			/>
+				<Modal
+					title="添加分类"
+					visible={showStatus===1}
+					onOk={this.handleOk}
+					onCancel={()=>{
+						this.setState({showStatus:0})
+						}	
+					}
+				>
+				</Modal>
+				
+				<Modal
+					title="修改分类"
+					visible={showStatus===2}
+					onOk={this.handleOk}
+					onCancel={()=>{
+						this.setState({showStatus:0})
+						}
+					}
+				>
+
+				</Modal>
     		</Card>
         )
     }
