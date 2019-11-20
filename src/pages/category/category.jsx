@@ -1,7 +1,7 @@
 import React, { Component} from 'react'
 import {Button, Icon, Table, Card, message, Modal} from 'antd'
 import LinkButton from '../../components/link-button'
-import {reqCategorys, reqUpdateCategory} from '../../api'
+import {reqCategorys, reqUpdateCategory, reqAddCategory} from '../../api'
 import AddForm from './add-form'
 import UpdateForm from './update-form'
 /*
@@ -35,7 +35,7 @@ export default class Category extends Component {
 		    	<span>
 		    		<LinkButton onClick={()=>this.showUpdate(category)}>修改分类</LinkButton>
 		    		{/*如何向事件回调函数传递参数：先定义一个箭头函数，在函数中调用处理的函数并传入参数*/}
-		    		{this.state.partenId==='0' ? <LinkButton onClick={() => this.showSubCategorys(category)}>查看子分类</LinkButton> : null}
+		    		{this.state.parentId==='0' ? <LinkButton onClick={() => this.showSubCategorys(category)}>查看子分类</LinkButton> : null}
 		    	</span>
 		    )
 		  },
@@ -44,19 +44,19 @@ export default class Category extends Component {
 	/*
 	异步获取一级或二级分类列表显示
 	*/
-	getCategorys = async () => {
+	getCategorys = async (parentId) => {
 		//在发请求前，显示loading
 		this.setState({loading: true})
-		const {parentId} = this.state
+		parentId = parentId || this.state.parentId
 		//发异步ajax请求获取请求数据
-		const result = await reqCategorys('0')
+		const result = await reqCategorys(parentId)
 		// 在发请求后，隐藏loading
 		this.setState({loading: false})
 		if (result.status===0){
 			//取出分类数组（可能是一级的也可能是二级的）
 			const categorys = result.data
 			if (parentId === '0'){
-				//更新状态一级分类状态
+				//更新一级分类状态
 				this.setState({
 					categorys
 				})
@@ -77,7 +77,7 @@ export default class Category extends Component {
 		//先更新状态
 		this.setState({
 			parentId: category._id,
-			parentName: category._name,
+			parentName: category.name,
 		}, () => {//在状态更新且重新render()后执行
 			//获取二级分类列表
 			this.getCategorys()
@@ -120,26 +120,59 @@ export default class Category extends Component {
 		this.setState({showStatus:0})
 	}
 	/*
+	提交添加分类请求
+	*/
+	addCategory = () => {
+		//进行表单验证
+		this.form.validateFields(async (err,values)=>{
+			if(!err){
+				//1.关闭对话框
+				this.setState({showStatus: 0})
+				//准备请求参数
+				const {categoryName} = values
+				const {parentId} = values
+				//清除输入框数据
+				this.form.resetFields()
+				//2、发送ajax异步请求
+				const result = await reqAddCategory(categoryName, parentId)
+				if(result.status===0){
+					//3、重新获取列表
+					if(parentId===this.state.parentId){//如果添加的分类是当前分类则从新获取
+						this.getCategorys()
+					}else if (parentId==='0'){//如果当前显示的二级分类，添加一级分类，则重新获取列表但不显示
+						this.getCategorys(parentId)
+					}
+				}
+			}
+		})
+	}
+	/*
 	提交修改分类请求
 	*/
-	updateCategory = async () => {
-		//1.关闭对话框
-		this.setState({showStatus: 0})
-		//准备请求参数
-		const categoryId = this.category._id
-		const oldCategoryName = this.category.name
-		const categoryName = this.form.getFieldValue('categoryName')
-		//清除输入框的数据
-		this.form.resetFields()
-		//2.发送ajax请求更新数据, 如果categoryName没有改变就不用发送请求
-		if (oldCategoryName != categoryName){
-			const result = await reqUpdateCategory({categoryId, categoryName})
-			if (result.status===0){
-				//3.再次显示列表
-				message.success("修改成功")
-				this.getCategorys()
+	updateCategory = () => {
+		//进行表单验证， 只有通过了才处理
+		this.form.validateFields(async (err, values)=>{
+			if(!err){
+				//1.关闭对话框
+				this.setState({showStatus: 0})
+				//准备请求参数
+				const categoryId = this.category._id
+				const oldCategoryName = this.category.name
+				const categoryName = this.form.getFieldValue('categoryName')
+				//清除输入框的数据
+				this.form.resetFields()
+				//2.发送ajax请求更新数据, 如果categoryName没有改变就不用发送请求
+				if (oldCategoryName != categoryName){
+					const result = await reqUpdateCategory({categoryId, categoryName})
+					if (result.status===0){
+						//3.再次显示列表
+						message.success("修改成功")
+						this.getCategorys()
+					}
+				}
 			}
-		}
+		})
+		
 	}
 	/*
 	为第一次render（）准备数据
@@ -189,10 +222,14 @@ export default class Category extends Component {
 				<Modal
 					title="添加分类"
 					visible={showStatus===1}
-					onOk={this.handleOk}
+					onOk={this.addCategory}
 					onCancel={this.onClickCancle}
 				>
-					<AddForm />
+					<AddForm 
+					 categorys={categorys}
+					 parentId={parentId}
+					 setForm={form=>{this.form=form}}
+					/>
 				</Modal>
 				
 				<Modal
