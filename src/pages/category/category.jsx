@@ -1,7 +1,7 @@
 import React, { Component} from 'react'
 import {Button, Icon, Table, Card, message, Modal} from 'antd'
 import LinkButton from '../../components/link-button'
-import {reqCategorys} from '../../api'
+import {reqCategorys, reqUpdateCategory} from '../../api'
 import AddForm from './add-form'
 import UpdateForm from './update-form'
 /*
@@ -33,7 +33,7 @@ export default class Category extends Component {
 		    width: '300px',
 		    render: (category) => (//返回需要显示的界面标签
 		    	<span>
-		    		<LinkButton onClick={this.updateCategory}>修改分类</LinkButton>
+		    		<LinkButton onClick={()=>this.showUpdate(category)}>修改分类</LinkButton>
 		    		{/*如何向事件回调函数传递参数：先定义一个箭头函数，在函数中调用处理的函数并传入参数*/}
 		    		{this.state.partenId==='0' ? <LinkButton onClick={() => this.showSubCategorys(category)}>查看子分类</LinkButton> : null}
 		    	</span>
@@ -105,8 +105,41 @@ export default class Category extends Component {
 	/*
 	显示修改分类对话框
 	*/
-	updateCategory = () => {
+	showUpdate = (category) => {
+		//保存category对象
+		this.category = category
+		//更新状态
 		this.setState({showStatus: 2})
+	}
+	/*
+	点击取消按钮隐藏对话框
+	*/
+	onClickCancle = () =>{
+		//清除输入框的数据
+		this.form.resetFields()
+		this.setState({showStatus:0})
+	}
+	/*
+	提交修改分类请求
+	*/
+	updateCategory = async () => {
+		//1.关闭对话框
+		this.setState({showStatus: 0})
+		//准备请求参数
+		const categoryId = this.category._id
+		const oldCategoryName = this.category.name
+		const categoryName = this.form.getFieldValue('categoryName')
+		//清除输入框的数据
+		this.form.resetFields()
+		//2.发送ajax请求更新数据, 如果categoryName没有改变就不用发送请求
+		if (oldCategoryName != categoryName){
+			const result = await reqUpdateCategory({categoryId, categoryName})
+			if (result.status===0){
+				//3.再次显示列表
+				message.success("修改成功")
+				this.getCategorys()
+			}
+		}
 	}
 	/*
 	为第一次render（）准备数据
@@ -122,6 +155,11 @@ export default class Category extends Component {
     render() {
     	//读取状态数据
 		const {categorys, loading, subCategorys, parentId, parentName, showStatus} = this.state
+		//获取分类对象，如果不存在设置为空
+
+		const category = this.category || {}
+
+		
     	//card的左侧
     	const title = parentId==='0' ? '一级分类' : (
     		<span>
@@ -152,10 +190,7 @@ export default class Category extends Component {
 					title="添加分类"
 					visible={showStatus===1}
 					onOk={this.handleOk}
-					onCancel={()=>{
-						this.setState({showStatus:0})
-						}	
-					}
+					onCancel={this.onClickCancle}
 				>
 					<AddForm />
 				</Modal>
@@ -163,13 +198,14 @@ export default class Category extends Component {
 				<Modal
 					title="修改分类"
 					visible={showStatus===2}
-					onOk={this.handleOk}
-					onCancel={()=>{
-						this.setState({showStatus:0})
-						}
-					}
+					onOk={this.updateCategory}
+					onCancel={this.onClickCancle}
 				>
-					<UpdateForm />
+					<UpdateForm
+					 categoryName={category.name}
+					 //父组件category向子组件UpdateForm传递一个名为setForm的函数属性，为了让子组件的form传递给父组件
+					 setForm={(form)=>{this.form=form}}
+					 />
 				</Modal>
     		</Card>
         )
