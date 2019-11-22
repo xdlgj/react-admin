@@ -1,29 +1,17 @@
 import React, {Component} from 'react'
 import {Card, Button, Icon, Select, Input, Table} from 'antd'
 import LinkButton from '../../components/link-button'
+import {PAGE_SIZE} from '../../utils/constants'
+import {reqProductList} from '../../api'
 /*
 Product的主页路由组件
 */
 const { Option } = Select
 export default class ProductHome extends Component {
 	state = {
-		products : [
-			{
-				"status":1,
-				"images":[
-					"xx.jpg",
-					"ss.jpg"
-				],
-				"_id":"123",
-				"name":"三星",
-				"desc":"xxxxxx",
-				"price":3000,
-				"pCategoryId": "1234",
-				"categoryId": "12312",
-				"detail": 'xxxxxxx',
-				"__v":0
-			}
-		],
+		loading: false,
+		total : 0 , // 总共的商品数
+		products : [],
 	}
 	/*
 	初始化表格的表头
@@ -69,11 +57,29 @@ export default class ProductHome extends Component {
 		  },
 		];
 	}
+	getProducts = async (pageName) => {
+		this.setState({loading: true})
+		const result = await reqProductList(pageName, PAGE_SIZE)
+		this.setState({loading: false})
+		if (result.status===0){
+			const {total,list} = result.data
+			this.setState({
+				total,
+				products: list
+			})
+		}
+	}
 	componentWillMount(){
 		this.initColums()
 	}
+	/*
+	发送请求获取数据
+	*/
+	componentDidMount () {
+		this.getProducts(1)
+	}
 	render(){
-		const {products} = this.state
+		const {total, products,loading} = this.state
 		const title = (
 			<span>
 				<Select defaultValue="1" style={{width:150}}>
@@ -93,9 +99,17 @@ export default class ProductHome extends Component {
 		return(
 			<Card title={title} extra={extra}>
 				<Table
+					loading={loading}
 					bordered
 					columns={this.columns}
 					dataSource={products} 
+					pagination={{
+						total,
+						defaultPageSize:PAGE_SIZE, 
+						showQuickJumper: true,
+						onChange: this.getProducts,
+					}}
+
 				/>
 			</Card>
 		)
