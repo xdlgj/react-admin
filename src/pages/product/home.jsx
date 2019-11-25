@@ -1,8 +1,8 @@
 import React, {Component} from 'react'
-import {Card, Button, Icon, Select, Input, Table} from 'antd'
+import {Card, Button, Icon, Select, Input, Table, message} from 'antd'
 import LinkButton from '../../components/link-button'
 import {PAGE_SIZE} from '../../utils/constants'
-import {reqProductList} from '../../api'
+import {reqProductList, reqSearchProduts, reqUpdateStatus} from '../../api'
 /*
 Product的主页路由组件
 */
@@ -12,6 +12,8 @@ export default class ProductHome extends Component {
 		loading: false,
 		total : 0 , // 总共的商品数
 		products : [],
+		searchType : 'productName',
+		searchName: '',
 	}
 	/*
 	初始化表格的表头
@@ -34,12 +36,16 @@ export default class ProductHome extends Component {
 		  {
 		  	width:100,
 		    title: '状态',
-		    dataIndex: 'status',
-		    render: (status) => {
+		    dataIndex: '',
+		    render: (product) => {
+				const {_id, status} = product
+				const newStatus = status === 1 ? 2 :1 
 		    	return(
 		    		<span>
-		    			<Button type='primary'>下架</Button>
-		    			<span>在售</span>
+						<Button type='primary' onClick={()=>this.updateStatus(_id, newStatus)}>
+							{status===1 ? "在售": "下架"}
+						</Button>
+						<span>{status===1 ? "下架":"在售"}</span>
 		    		</span>
 		    	)
 		    }
@@ -57,9 +63,16 @@ export default class ProductHome extends Component {
 		  },
 		];
 	}
-	getProducts = async (pageName) => {
+	getProducts = async (pageNum) => {
+		this.pageNum = pageNum //保存当前页码，让其他函数可以看到
 		this.setState({loading: true})
-		const result = await reqProductList(pageName, PAGE_SIZE)
+		const {searchType, searchName} = this.state
+		let result
+		if (searchName){//搜索分页
+			result = await reqSearchProduts({pageNum, pageSize:PAGE_SIZE, searchType, searchName})
+		}else {//一般分页
+			result = await reqProductList(pageNum, PAGE_SIZE)
+		}
 		this.setState({loading: false})
 		if (result.status===0){
 			const {total,list} = result.data
@@ -67,6 +80,16 @@ export default class ProductHome extends Component {
 				total,
 				products: list
 			})
+		}
+	}
+	/*
+	更新商品状态
+	*/
+	updateStatus = async (productId, status) => {
+		const result = await reqUpdateStatus(productId, status)
+		if(result.status===0){
+			message.success("更新商品成功")
+			this.getProducts(this.pageNum)
 		}
 	}
 	componentWillMount(){
@@ -79,15 +102,15 @@ export default class ProductHome extends Component {
 		this.getProducts(1)
 	}
 	render(){
-		const {total, products,loading} = this.state
+		const {total, products, loading, searchType, searchName} = this.state
 		const title = (
 			<span>
-				<Select defaultValue="1" style={{width:150}}>
-					<Option value='1'>按名字搜索</Option>
-					<Option value='2'>按描述搜索</Option>
+				<Select defaultValue={searchType} style={{width:150}} onSelect={(value)=>this.setState({searchType:value})}>
+					<Option value='productName'>按名字搜索</Option>
+					<Option value='productDesc'>按描述搜索</Option>
 				</Select>
-				<Input placeholder='关键字' style={{width:150,margin:'0 15px'}} />
-				<Button type='primary'>搜索</Button>
+				<Input placeholder='关键字' style={{width:150,margin:'0 15px'}} onChange={(event)=>this.setState({searchName:event.target.value})} />
+				<Button type='primary' onClick={() => this.getProducts(1)}>搜索</Button>
 			</span>
 		)
 		const extra = (

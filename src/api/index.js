@@ -24,6 +24,10 @@ export const reqAddCategory = (categoryName, parentId) => ajax('/manage/category
 export const reqUpdateCategory = ({categoryId, categoryName}) => ajax('/manage/category/update', {categoryId, categoryName}, 'POST')
 //获取商品分页列表
 export const reqProductList = (pageNum, pageSize) => ajax('manage/product/list', {pageNum, pageSize})
+//根据商品的名字或描述搜索
+export const reqSearchProduts = ({pageNum, pageSize, searchType, searchName}) =>ajax('/manage/product/search', {pageNum, pageSize, [searchType]: searchName})
+//改变商品的状态在售或下架
+export const reqUpdateStatus = (productId, status) => ajax("/manage/product/updateStatus", {productId, status}, 'POST')
 /*
 jsonp请求的接口请求函数
 */
