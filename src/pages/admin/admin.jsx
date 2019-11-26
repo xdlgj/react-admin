@@ -12,6 +12,7 @@ import Home from '../home/home'
 import Product from '../product/product'
 import Role from '../role/role'
 import User from '../user/user'
+import NotFound from '../not-found/not-found'
 const {Footer, Sider, Content } = Layout;
 /*
 后台管理的路由组件
@@ -31,6 +32,7 @@ export default class Admin extends Component {
                     <Header />
                     <Content style={{margin: 20, backgroundColor: 'white'}}>
                         <Switch>
+                            <Redirect exact from='/' to='/home'/>
                             <Route path='/home' component={Home} />
                             <Route path='/category' component={Category} />
                             <Route path='/product' component={Product} />
@@ -39,7 +41,7 @@ export default class Admin extends Component {
                             <Route path='/charts/bar' component={Bar} />
                             <Route path='/charts/line' component={Line} />
                             <Route path='/charts/pie' component={Pie} />
-                            <Redirect to='/home'/>
+                            <Route component={NotFound} />
                         </Switch>
                     </Content>
                     <Footer style={{textAlign:'center',color:'cccccc'}}>推荐使用谷歌浏览器</Footer>

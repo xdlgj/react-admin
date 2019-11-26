@@ -15,7 +15,10 @@ class LeftNav extends Component {
     使用map() + 递归调用
     */
     getMenuNodes_map =  (menuList) => {
-        const path = this.props.location.pathname
+        let path = this.props.location.pathname
+        if (path.indexOf("/product")===0){
+            path = '/product'
+        }
         return menuList.map(item =>{
             if (!item.children){
                 return (
@@ -55,7 +58,10 @@ class LeftNav extends Component {
     使用reduce() + 递归调用
     */
    getMenuNodes = (menuList) =>{
-       const path = this.props.location.pathname
+       let path = this.props.location.pathname
+       if (path.indexOf("/product")===0){
+        path = '/product'
+        }
        return menuList.reduce((pre, item) =>{
            if(!item.children){
                pre.push((
@@ -99,7 +105,10 @@ class LeftNav extends Component {
        this.items =this.getMenuNodes(menuList)
    }
     render() {
-        const path = this.props.location.pathname
+        let path = this.props.location.pathname
+        if (path.indexOf("/product")===0){
+            path = '/product'
+        }
         return (
             <div className='left-nav'>
                 <Link to='/home' className='left-nav-header'>
