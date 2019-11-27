@@ -1,9 +1,10 @@
 import React, {Component} from 'react'
-import {Card, Icon, Form, Button, Input} from 'antd'
+import {Card, Icon, Form, Button, Input, Upload, message} from 'antd'
 import LinkButton from "../../components/link-button"
 import {withRouter} from 'react-router-dom'
 import { Cascader } from 'antd';
 import { reqCategorys} from '../../api'
+import PicturesWall from './pictures-wall'
 /*
 Product的添加和更新子路由组件
 */
@@ -12,7 +13,11 @@ const {TextArea} = Input
 class ProductAddUpdate extends Component {
 	state = {
 		options : [],
+		loading : false, 
 	}
+	/*
+	商品分类下拉选项
+	*/
 	loadData = async (selectedOptions) => {
 		//获取被选中的对象
 	    const targetOption = selectedOptions[selectedOptions.length - 1];
@@ -51,21 +56,45 @@ class ProductAddUpdate extends Component {
 		}
 
 	}
+	/*
+	提交表单
+	*/
 	submit = () =>{
 		//进行表单验证，如果通过了，才发送请求
 		this.props.form.validateFields((error, values)=>{
 			if(!error){
+				console.log("values:", values)
 				alert("发送ajax请求")
 			}
 		})
 	}
-	initOptions = (categorys) => {
+	/*
+	初始化商品分类下拉选项
+	*/
+	initOptions = async (categorys) => {
 		//根据categorys生成options数组
 		const options = categorys.map((category)=>({
 			value: category._id,
 		    label: category.name,
 		    isLeaf: false
 		}))
+		//如果当前是更新， 且商品是一个二级分类
+		const {isUpdate, product} = this
+		const {pCategoryId} = product
+		if (isUpdate && pCategoryId !=='0'){
+			//异步获取二级分类列表
+			const subCategorys = await this.getCategorys(pCategoryId)
+			//生成二级下拉列表的options
+			const childOptions = subCategorys.map(subCategory =>({
+				value: subCategory._id,
+	    		label: subCategory.name,
+	    		isLeaf: true
+			}))
+			//获取一级分类
+			const targetOption = options.find(option => option.value===pCategoryId)
+			//关联到对应的一级分类
+			if(targetOption) targetOption.children = childOptions
+		}
 		//更新状态
 		this.setState({options})
 	}
@@ -84,10 +113,37 @@ class ProductAddUpdate extends Component {
 			}
 		}
 	}
+	componentWillMount (){
+		// 获取携带的state
+		const product = this.props.location.state
+		// 保存是否更新的标识,转换为boolean类型
+		this.isUpdate = !!product
+		// 保存商品对象如果没有保存空对象
+		this.product = product || {}
+	}
 	componentDidMount () {
 		this.getCategorys('0')
 	}
 	render(){
+		const {isUpdate, product} = this
+		const {pCategoryId, categoryId} = product
+		//准备级联列表显示的数组
+		const categoryIds = []
+		if (isUpdate) {//如果是更新商品
+			if(pCategoryId==='0'){//一级分类
+				categoryIds.push(categoryId)
+			}else{//二级分类
+				categoryIds.push(pCategoryId)
+				categoryIds.push(categoryId)
+			}
+		}
+		const uploadButton = (
+			<div>
+			  <Icon type={this.state.loading ? 'loading' : 'plus'} />
+			  <div className="ant-upload-text">Upload</div>
+			</div>
+		);
+		const { imageUrl } = this.state;
 		//指定Item布局的配置对象
 		const formItemLayout = {
 			labelCol: {span:2}, //左侧label的宽度
@@ -98,7 +154,7 @@ class ProductAddUpdate extends Component {
 				<LinkButton onClick={()=>this.props.history.goBack()}>
 					<Icon type="arrow-left" />
 				</LinkButton>
-				<span>添加商品</span>
+				<span>{isUpdate ? "更新商品" : "添加商品"}</span>
 			</span>
 		)
 		const {getFieldDecorator} = this.props.form
@@ -108,7 +164,7 @@ class ProductAddUpdate extends Component {
 					<Item label="商品名称:">
 						{
 							getFieldDecorator('name', {
-								initValue: '',
+								initialValue: product.name,
 								rules:[
 									{
 										required: true,
@@ -123,7 +179,7 @@ class ProductAddUpdate extends Component {
 					<Item label="商品描述:">
 						{
 							getFieldDecorator('desc', {
-								initValue: '',
+								initialValue: product.desc,
 								rules:[
 									{
 										required: true,
@@ -138,7 +194,7 @@ class ProductAddUpdate extends Component {
 					<Item label="商品价格:">
 						{
 							getFieldDecorator('price', {
-								initValue: '',
+								initialValue: product.price,
 								rules:[
 									{
 										required: true,
@@ -154,13 +210,27 @@ class ProductAddUpdate extends Component {
 						}
 					</Item>
 					<Item label="商品分类:">
-						 <Cascader
-					        options={this.state.options}
-					        loadData={this.loadData}
-					     />
+						{
+							getFieldDecorator('categoryIds', {
+								initialValue: categoryIds,
+								rules:[
+									{
+										required: true,
+										message: "必须输入商品分类",
+									},
+								]
+							})(
+								<Cascader
+									placeholder='请输入商品分类'
+									options={this.state.options}
+									loadData={this.loadData}
+								/>
+							)
+						}	
+						 
 					</Item>
 					<Item label="商品图片:">
-						<div>商品图片</div>
+						<PicturesWall />
 					</Item>
 					<Item label="商品详情:">
 						<div>商品详情</div>
