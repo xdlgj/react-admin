@@ -30,6 +30,8 @@ export const reqProductList = (pageNum, pageSize) => ajax('manage/product/list',
 export const reqSearchProduts = ({pageNum, pageSize, searchType, searchName}) =>ajax('/manage/product/search', {pageNum, pageSize, [searchType]: searchName})
 //改变商品的状态在售或下架
 export const reqUpdateStatus = (productId, status) => ajax("/manage/product/updateStatus", {productId, status}, 'POST')
+//删除照片
+export const reqDeleteImg = (name) => ajax('/manage/img/delete', {name}, 'POST')
 /*
 jsonp请求的接口请求函数
 */
