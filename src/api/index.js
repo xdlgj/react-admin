@@ -32,6 +32,8 @@ export const reqSearchProduts = ({pageNum, pageSize, searchType, searchName}) =>
 export const reqUpdateStatus = (productId, status) => ajax("/manage/product/updateStatus", {productId, status}, 'POST')
 //删除照片
 export const reqDeleteImg = (name) => ajax('/manage/img/delete', {name}, 'POST')
+//添加或更新商品
+export const reqAddOrUpdateProduct = (product) => ajax('/manage/product/'+ (product._id?'update':'add'), product, 'POST')
 /*
 jsonp请求的接口请求函数
 */
