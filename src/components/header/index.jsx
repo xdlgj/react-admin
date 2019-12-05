@@ -39,7 +39,7 @@ class Header extends Component {
                 }
             }else{
                 item.children.map((cItem) => {
-                    if (cItem.key === path) {
+                    if (path.indexOf(cItem.key)===0) {
                         title = cItem.title
                     }
                 })

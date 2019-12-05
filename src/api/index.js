@@ -34,6 +34,8 @@ export const reqUpdateStatus = (productId, status) => ajax("/manage/product/upda
 export const reqDeleteImg = (name) => ajax('/manage/img/delete', {name}, 'POST')
 //添加或更新商品
 export const reqAddOrUpdateProduct = (product) => ajax('/manage/product/'+ (product._id?'update':'add'), product, 'POST')
+//获取角色列表
+export const reqRoleList = () => ajax("/manage/role/list")
 /*
 jsonp请求的接口请求函数
 */
