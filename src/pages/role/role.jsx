@@ -161,7 +161,13 @@ export default class Role extends Component {
                     rowKey='_id'
                     dataSource={roles} 
                     columns={this.columns} 
-                    rowSelection={{type: 'radio', selectedRowKeys: [role._id]}}
+                    rowSelection={{
+                        type: 'radio', 
+                        selectedRowKeys: [role._id],
+                        onSelect: (role) => { //点击单选框触发的事件
+                            this.setState({role})   
+                        }
+                    }}
                     onRow={this.onRow}
                     pagination={{defaultPageSize: PAGE_SIZE}}
                 />
