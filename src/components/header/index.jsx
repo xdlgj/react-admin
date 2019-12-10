@@ -53,8 +53,8 @@ class Header extends Component {
             content: '确定要退出吗？',
             onOk : () => {
               // 清除内存中的用户信息
-              memoryUtils.userName = ''
-              storageUtils.removeUserNme()
+              memoryUtils.user = {}
+              storageUtils.removeUser()
               this.props.history.replace('/login')
             },
         });
@@ -72,7 +72,7 @@ class Header extends Component {
         clearInterval(this.intervalId)
     }
     render() {
-        const userName = memoryUtils.userName
+        const user = memoryUtils.user
         const {currentTime, dayPictureUrl, weather} = this.state
         const path = this.props.location.pathname
         //根据请求路径获取标题
@@ -80,7 +80,7 @@ class Header extends Component {
         return (
             <div className='header'>
                <div className='header-top'>
-                    <span>欢迎 {userName}</span>
+                    <span>欢迎 {user.username}</span>
                     <LinkButton onClick={this.logout}>退出</LinkButton>
                </div>
                <div className='header-bottom'>

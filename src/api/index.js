@@ -13,9 +13,6 @@ import { message } from 'antd'
 
 export const reqLogin = (username, password) => ajax('/login', {username, password}, 'POST')
 
-//添加用户
-export const reqAddUser = (user) => ajax('/manage/user/add', user, 'POST')
-
 //获取一级或二级分类的列表
 export const reqCategorys = (parentId) => ajax('/manage/category/list', {parentId})
 //添加分类
@@ -40,6 +37,12 @@ export const reqRoleList = () => ajax("/manage/role/list")
 export const reqAddRole = (roleName) => ajax("/manage/role/add", {roleName}, 'POST')
 //更新角色权限
 export const reqUpdateRole = (role) => ajax('/manage/role/update', role, 'POST')
+//获取用户列表
+export const reqUsers = () => ajax('/manage/user/list')
+//删除用户
+export const reqDeleteUser = (userId) => ajax('/manage/user/delete', {userId}, 'POST')
+//添加或更新用户
+export const reqAddOrUpdateUser = (user) => ajax('/manage/user/' + (user._id ? 'update': 'add'), user, 'POST')
 /*
 jsonp请求的接口请求函数
 */

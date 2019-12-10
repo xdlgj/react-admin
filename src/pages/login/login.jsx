@@ -24,10 +24,11 @@ class Login extends Component {
                 const result = await reqLogin(username, password)
                 if (result.status === 0){
                     message.success('登录成功')
-                    //将username保存到内存中
-                    memoryUtils.userName = username
-                    //将username保存到store中
-                    storageUtils.saveUserName(username)
+                    const user = result.data
+                    //将user保存到内存中
+                    memoryUtils.user = user
+                    //将user保存到store中
+                    storageUtils.saveUser(user)
                     //跳转到管理界面(不需要再回退到登录界面所以用replace方法)
                     this.props.history.replace('/')
                 }else{
@@ -59,8 +60,7 @@ class Login extends Component {
     }
     render(){
         //如果用户已经登录，自动跳转到管理界面
-        const username = memoryUtils.userName
-        if(username){
+        if(memoryUtils.user && memoryUtils.user._id){
             return <Redirect to='/'/>
         }
         //得到具有强大功能form对象
