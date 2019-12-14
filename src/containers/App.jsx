@@ -1,7 +1,7 @@
 import React, {Component} from 'react'
 import {connect} from 'react-redux'
 import Counter from '../components/counter'
-import {increment, decrement} from '../redux/actions'
+import {increment, decrement, incrementAsync} from '../redux/actions'
 /*
 容器组件： 通过connect包装UI组件
 connenc()：高阶函数
@@ -13,6 +13,6 @@ connect()返回的函数是一个高阶组件，接收一个UI组件，生成一
 
 
 export default connect(
-	state => ({count: state}),
-	{increment, decrement}
+	state => ({count: state.count}),
+	{increment, decrement, incrementAsync}
 )(Counter)
