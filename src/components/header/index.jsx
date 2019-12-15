@@ -8,10 +8,15 @@ import {withRouter} from 'react-router-dom'
 import {Modal} from 'antd'
 import LinkButton from '../../components/link-button'
 import './index.less'
+import {PropTypes} from 'prop-types'
+import {connect} from 'react-redux'
 /*
 头部组件
 */
 class Header extends Component {
+    static propTypes = {
+        title: PropTypes.string.isRequired,
+    }
     state = {
         currentTime : formatDate(Date.now()), //获取当前时间
         dayPictureUrl : '', //获取天气图片的url
@@ -74,9 +79,10 @@ class Header extends Component {
     render() {
         const user = memoryUtils.user
         const {currentTime, dayPictureUrl, weather} = this.state
-        const path = this.props.location.pathname
+        //const path = this.props.location.pathname
         //根据请求路径获取标题
-        const title = this.getTitle(path)
+        //const title = this.getTitle(path)
+        const title = this.props.title
         return (
             <div className='header'>
                <div className='header-top'>
@@ -97,4 +103,7 @@ class Header extends Component {
         )
     }
 }
-export default withRouter(Header)
+export default connect(
+    state => ({title: state.headTitle}),
+    {}
+)(withRouter(Header))

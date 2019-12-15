@@ -1,17 +1,22 @@
+/*
+入口js
+*/
+
 import React from 'react'
 import ReactDOM from 'react-dom'
+import App from './App'
+import memoryUtils from './utils/memoryUtils'
+import storageUtils from './utils/storageUtils'
 import {Provider} from 'react-redux'
-import App from './containers/App'
 import store from './redux/store'
 
+//读取local中的username 保存到内存中
+const user = storageUtils.getUser()
+memoryUtils.user = user
+
+// 将A组件标签渲染到index页面的div上
 ReactDOM.render((
-	<Provider store={store}> 
+	<Provider store={store}>
 		<App />
 	</Provider>
-	), document.getElementById('root'))
-
-//给store绑定状态更新的监听
-store.subscribe(() => { // store内部的状态数据发生改变时回调
-	//重新渲染App组件
-	ReactDOM.render(<App store={store}/>, document.getElementById('root'))
-})
+	), document.getElementById("root"))

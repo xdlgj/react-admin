@@ -6,11 +6,18 @@ import memoryUtils from '../../utils/memoryUtils'
 
 import './index.less'
 import logo from '../../assets/images/logo.png'
+import {connect} from 'react-redux'
+import {PropTypes} from 'prop-types'
+import {setHeadTitle} from '../../redux/actions'
 /*
 左侧导航组件
 */
 const { SubMenu } = Menu;
 class LeftNav extends Component {
+
+    static propTypes = {
+        setHeadTitle: PropTypes.func.isRequired,
+    }
     /*
     判断当前用户是否有看到当前item对应菜单的权限
     */
@@ -83,15 +90,21 @@ class LeftNav extends Component {
         path = '/product'
         }
        return menuList.reduce((pre, item) =>{
+           //如果当前用户有item对应的权限，才需要显示对应的菜单项
            if (this.hasAuth(item)){
                 if(!item.children){
+                    //判断Item是否是当前对应Item
+                    if (item.key === path || path.indexOf(item.key) ===0 ){
+                        //更新redux中的headTitle状态
+                        this.props.setHeadTitle(item.title)
+                    }
                     pre.push((
-                    <Menu.Item key={item.key}>
-                    <Link to={item.key}>
-                        <Icon type={item.icon} />
-                        <span>{item.title}</span>
-                    </Link> 
-                    </Menu.Item>
+                        <Menu.Item key={item.key}>
+                        <Link to={item.key} onClick={() => this.props.setHeadTitle(item.title)}>
+                            <Icon type={item.icon} />
+                            <span>{item.title}</span>
+                        </Link> 
+                        </Menu.Item>
                     ))
                 }else{
                     //查找一个与当前请求路径匹配的子item
@@ -101,18 +114,18 @@ class LeftNav extends Component {
                         this.openKey = item.key
                     }
                     pre.push((
-                    <SubMenu
-                    key={item.key}
-                    title={
-                    <span>
-                        <Icon type={item.icon} />
-                        <span>{item.title}</span>
-                    </span>
-                    }
-                    >
-                        {/*递归调用*/}
-                        {this.getMenuNodes(item.children)}
-                    </SubMenu>
+                        <SubMenu
+                            key={item.key}
+                            title={
+                                <span>
+                                    <Icon type={item.icon} />
+                                    <span>{item.title}</span>
+                                </span>
+                            }
+                            >
+                            {/*递归调用*/}
+                            {this.getMenuNodes(item.children)}
+                        </SubMenu>
                     ))
                 }
            } 
@@ -149,4 +162,7 @@ withRouter高阶组件：
 包装非路由组件，返回一个新的组件
 新的组件向非路由组件传递3个属性：history/location/match
 */
-export default withRouter(LeftNav)
+export default connect(
+    state => ({}),
+    {setHeadTitle}
+)(withRouter(LeftNav))

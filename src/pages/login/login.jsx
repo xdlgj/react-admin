@@ -30,7 +30,7 @@ class Login extends Component {
                     //将user保存到store中
                     storageUtils.saveUser(user)
                     //跳转到管理界面(不需要再回退到登录界面所以用replace方法)
-                    this.props.history.replace('/')
+                    this.props.history.replace('/home')
                 }else{
                     message.error(result.msg)
                 }   
